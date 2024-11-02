@@ -12,10 +12,6 @@ let buildings = [
     { src: 'building11.png', width: 95, height: 95 }
 ];
 
-
-
-
-
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -178,6 +174,9 @@ function gameLoop() {
         if (obstacle.x + obstacle.width < 0) {
             obstacles.splice(i, 1);
             score++;
+            if (score % 5 == 0 && gameSpeed != 25){
+                gameSpeed ++;
+            }
             document.getElementById('score').textContent = score;
         }
     }
