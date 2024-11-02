@@ -231,6 +231,8 @@ function startGame() {
 
 function resetGame() {
     score = 0;
+    gameSpeed = 12; 
+
     document.getElementById('score').textContent = score;
     startGame();
 }
