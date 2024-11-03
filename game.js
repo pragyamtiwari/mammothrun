@@ -27,7 +27,7 @@ let jumpHeight = 0;
 let gravity = 10; // Reduced gravity for slower fall
 let maxJumpHeight = 65; // Increased jump height for better clearance
 let score = 0;
-let gameSpeed = 12; 
+let gameSpeed = 14; 
 let gameOver = false;
 let gameAlertShown = false;
 
@@ -174,7 +174,7 @@ function gameLoop() {
         if (obstacle.x + obstacle.width < 0) {
             obstacles.splice(i, 1);
             score++;
-            if (score % 5 == 0 && gameSpeed != 25){
+            if (score % 5 == 0 && gameSpeed != 35){
                 gameSpeed ++;
             }
             document.getElementById('score').textContent = score;
