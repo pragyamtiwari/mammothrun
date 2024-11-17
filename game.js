@@ -12,6 +12,13 @@ let buildings = [
     { src: 'building11.png', width: 95, height: 95 }
 ];
 
+const imageCache = [];
+buildings.forEach(building => {
+    const img = new Image();
+    img.src = building.src;
+    imageCache.push(img);
+});
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -30,17 +37,25 @@ let score = 0;
 let gameSpeed = 14; 
 let gameOver = false;
 let gameAlertShown = false;
-
+let firstTime = true;
 const elevatedGroundLevel = 160;
 const buildingspeciallevel = 30; 
 let jumpCount = 0; 
 let spawnInterval = 3000;
-; 
-let lastSpawnTime = Date.now(); 
+let lastBuildingIndex = -1;
 
-// Load Jump Sound
-const jumpSound = new Audio('jump.mp3'); // Ensure you have a jump.mp3 file
+console.log(gameSpeed);
+
+let lastSpawnTime = Date.now(); 
+let randomInterval = 2000;
+let baseInterval = 500;
+
+
+
+const jumpSound = new Audio('jump.mp3');
 const dieSound = new Audio('die.mp3');
+jumpSound.preload = 'auto';
+dieSound.preload = 'auto';
 
 // Mammoth Object
 const mammoth = {
@@ -91,10 +106,21 @@ const background = {
 // Building Class
 class Building {
     constructor() {
-        const building = buildings[Math.floor(Math.random() * buildings.length)];
+        let buildingIndex;
+        // Ensure the same building is not selected twice consecutively
+        do {
+            buildingIndex = Math.floor(Math.random() * buildings.length);
+        } while (buildingIndex === lastBuildingIndex);
 
-        this.width = building.width; // Increased width
-        this.height = building.height; // Increased height
+        lastBuildingIndex = buildingIndex; // Update the last building index
+
+        let building = buildings[buildingIndex];
+        if (firstTime){
+            building = buildings[1];
+            firstTime = false;
+        }
+        this.width = building.width; // Set width
+        this.height = building.height; // Set height
         this.x = canvas.width;
         this.y = canvas.height - buildingspeciallevel - this.height;
         this.image = new Image();
@@ -111,7 +137,7 @@ class Building {
 
     // Adjusted hitbox for lenient collision detection
     isColliding(mammoth) {
-        let buffer = 30; 
+        let buffer = 30;
         return (
             mammoth.x < this.x + this.width - buffer &&
             mammoth.x + mammoth.width > this.x + buffer &&
@@ -121,13 +147,14 @@ class Building {
     }
 }
 
+
 // Game Objects
 let obstacles = [];
 
 function spawnBuilding() {
     const currentTime = Date.now();
     if (currentTime - lastSpawnTime > spawnInterval) {
-        spawnInterval = 500 + Math.floor(Math.random() * 2000); // Base interval of 500ms
+        spawnInterval = baseInterval + Math.floor(Math.random() * randomInterval); // Base interval of 500ms
         obstacles.push(new Building());
         lastSpawnTime = currentTime;
     }
@@ -176,6 +203,15 @@ function gameLoop() {
             score++;
             if (score % 5 == 0 && gameSpeed != 35){
                 gameSpeed ++;
+            }
+            if (score % 10 == 0){
+                if (randomInterval > 500){
+                    randomInterval -= 350;
+                }
+                if (baseInterval > 200){
+                    baseInterval -= 50;
+                }
+
             }
             document.getElementById('score').textContent = score;
         }
@@ -232,6 +268,9 @@ function startGame() {
 function resetGame() {
     score = 0;
     gameSpeed = 12; 
+    firstTime = true;
+    randomInterval = 2000;
+    baseInterval = 500;
 
     document.getElementById('score').textContent = score;
     startGame();
@@ -239,4 +278,3 @@ function resetGame() {
 
 // Initialize Game
 startGame();
-
